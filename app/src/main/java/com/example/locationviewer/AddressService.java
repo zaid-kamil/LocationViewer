@@ -54,7 +54,7 @@ public class AddressService extends IntentService {
     private void sendResults(String msg, List<Address> addresses) {
         if (addresses != null) {
             Bundle data = new Bundle();
-            data.putParcelable("address1", addresses.get(0));
+            data.putParcelable("address", addresses.get(0));
             receiver.send(RESULT_OK, data);
         } else {
             Bundle data = new Bundle();

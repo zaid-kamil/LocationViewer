@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.locationviewer.databinding.ActivityMainBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         super.onCreate(savedInstanceState);
         bind = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
-
+        receiver = new AddressReceiver(new Handler());
         locationPermission = new String[]{
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -66,13 +67,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         i.putExtra("longitude", location.getLongitude());
                         i.putExtra("receiver", receiver);
                         startService(i);
+                        Toast.makeText(this, "service called", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
-                        bind.textLocation.setText("could not get location " + e.getMessage());
+                        bind.textLocation.setText("could not get location");
                     }
 
                 })
                 .addOnFailureListener(e -> {
-                    bind.textLocation.setText("could not get location " + e.getMessage());
+                    bind.textLocation.setText("could not get location");
                 });
     }
 
@@ -113,10 +115,15 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 Address addr = resultData.getParcelable("address");
 
                 if (addr != null) {
+
+                    String addressLine = addr.getAddressLine(0);
                     bind.textLocation.append(
-                            String.format("\n%s\n", addr.getAddressLine(0))
+                            String.format("\n%s\n", addressLine)
                     );
                 }
+            }
+            if(resultCode == RESULT_CANCELED){
+                bind.textLocation.append("\n Could not get address ");
             }
         }
     }
